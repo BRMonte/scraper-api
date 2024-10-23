@@ -21,9 +21,7 @@ module Api
       end
 
       def normalize_fields(fields)
-        return fields.to_unsafe_h if fields.is_a?(ActionController::Parameters)
-
-        fields
+        fields.is_a?(ActionController::Parameters) ? fields.to_unsafe_h : fields
       end
     end
   end
