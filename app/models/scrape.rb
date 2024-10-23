@@ -16,9 +16,17 @@ class Scrape
   private
 
   def fetch_response
-    Rails.cache.fetch(@url) do
-      fetch_url
+    cached_response = Rails.cache.read(@url)
+    if cached_response
+      Rails.logger.info(" **** Cache store: #{Rails.cache.class}")
+      Rails.logger.info("Cached response: #{cached_response.inspect}")
+      return cached_response
     end
+
+    response = fetch_url
+
+    Rails.cache.write(@url, response)
+    response
   end
 
   def fetch_url
@@ -36,7 +44,7 @@ class Scrape
   end
 
   def extract_field(document, selector)
-    document.css(selector).text.strip
+    document.css(selector).text.strip.gsub("\n", " ").squeeze(" ")
   end
 
   def valid_selector?(selector)
