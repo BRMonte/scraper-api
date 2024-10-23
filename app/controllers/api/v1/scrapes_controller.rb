@@ -1,6 +1,3 @@
-require_relative "../../../services/scraper_service"
-require_relative "../../../serializers/scrape_serializer"
-
 module Api
   module V1
     class ScrapesController < ApplicationController
