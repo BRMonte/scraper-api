@@ -14,6 +14,11 @@ gem "puma", ">= 5.0"
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
 # gem "kredis"
 
+# Nokogiri makes it easy to work with XML and HTML providing an API for reading, writing, modifying, and querying documents
+gem "nokogiri"
+
+gem "httparty"
+
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
 
