@@ -2,7 +2,26 @@ module Api
   module V1
     class ScrapesController < ApplicationController
       def index
-        render json: { data: "Hello, World!" }
+        url = params[:url]
+        fields = params[:fields] || {}
+
+        fields = normalize_fields(fields)
+
+        scraper_service = ScraperService.new(url, fields)
+        extracted_data = scraper_service.call
+
+        serializer = ScrapeSerializer.new(extracted_data, fields)
+        render json: serializer.serialize, status: :ok
+      end
+
+      private
+
+      def scrape_params
+        params.permit(:url, fields: {})
+      end
+
+      def normalize_fields(fields)
+        fields.is_a?(ActionController::Parameters) ? fields.to_unsafe_h : fields
       end
     end
   end
