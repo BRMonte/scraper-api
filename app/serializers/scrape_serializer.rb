@@ -5,8 +5,18 @@ class ScrapeSerializer
   end
 
   def serialize
-    @fields.transform_keys(&:to_s).each_with_object({}) do |(key, _), result|
-      result[key] = @data[key] if @data.key?(key)
+    result = { "meta" => {} }
+
+    @fields.transform_keys(&:to_s).each do |key, _|
+      if key == "meta"
+        @fields[key].each do |meta_tag|
+          result["meta"][meta_tag] = @data[key] ? @data[key][meta_tag] || "" : ""
+        end
+      elsif @data.key?(key)
+        result[key] = @data[key]
+      end
     end
+
+    result
   end
 end

@@ -18,7 +18,6 @@ class Scrape
   def fetch_response
     cached_response = Rails.cache.read(@url)
     if cached_response
-      Rails.logger.info(" **** Cache store: #{Rails.cache.class}")
       Rails.logger.info("Cached response: #{cached_response.inspect}")
       return cached_response
     end
@@ -34,17 +33,35 @@ class Scrape
   end
 
   def parse_document(body)
-    Nokogiri::HTML(body)
+    Nokogiri::HTML.parse(body)
   end
 
   def extract_data(document)
-    @fields.each_with_object({}) do |(key, selector), result|
-      result[key] = extract_field(document, selector) if valid_selector?(selector)
+    result = { "meta" => {} }
+
+    @fields.each do |key, selector|
+      if key == "meta"
+        selector.each do |meta_tag|
+          meta_element = document.at("meta[name='#{meta_tag}']")
+          result["meta"][meta_tag] = meta_element ? meta_element["content"] : ""
+        end
+      else
+        result[key] = extract_field(document, selector) if valid_selector?(selector)
+      end
     end
+
+    result
   end
 
   def extract_field(document, selector)
     document.css(selector).text.strip.gsub("\n", " ").squeeze(" ")
+  end
+
+  def extract_meta_data(document, meta_tags)
+    meta_tags.each_with_object({}) do |tag, meta_result|
+      meta_element = document.at("meta[name='#{tag}']")
+      meta_result[tag] = meta_element ? meta_element["content"] : nil
+    end
   end
 
   def valid_selector?(selector)
